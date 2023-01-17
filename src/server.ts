@@ -1,16 +1,30 @@
 import Fastify from "fastify";
+import { PrismaClient } from "@prisma/client";
+import cors from "@fastify/cors";
 
-const app = Fastify()
+const app = Fastify();
+const prisma = new PrismaClient();
+
+app.register(cors);
 
 // Metodo HTTP: Get, Post, Put, Patch, Delete
 
-app.get("/" , () => {
-    return "Hello World"
-})
+app.get("/", async () => {
+  const habits = await prisma.habit.findMany({
+    where: {
+      title: {
+        startsWith: "Beber",
+      },
+    },
+  });
 
-app.listen({
+  return habits;
+});
+
+app
+  .listen({
     port: 3333,
-}).then(() => {
-    console.log('HTTP Server running!');
-    
-})
+  })
+  .then(() => {
+    console.log("HTTP Server running!");
+  });
